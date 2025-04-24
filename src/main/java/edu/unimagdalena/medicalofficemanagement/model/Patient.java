@@ -1,27 +1,26 @@
 package edu.unimagdalena.medicalofficemanagement.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Patient {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
-    private String nombre;
+    private String fullName;
 
     @Email
     @NotBlank
@@ -29,8 +28,9 @@ public class Patient {
 
     private String phone;
 
-    private ArrayList historial =new ArrayList();
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<MedicalRecord> medicalRecords = new HashSet<>();
 
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Appointment> appointments = new HashSet<>();
 }
-
-//Datos del paciente (nombre, email, teléfono, historial)
