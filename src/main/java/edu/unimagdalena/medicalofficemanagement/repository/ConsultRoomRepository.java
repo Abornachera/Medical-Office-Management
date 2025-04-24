@@ -1,4 +1,7 @@
 package edu.unimagdalena.medicalofficemanagement.repository;
 
-public interface ConsultRoomRepository {
+import edu.unimagdalena.medicalofficemanagement.model.ConsultRoom;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ConsultRoomRepository extends JpaRepository<ConsultRoom, Long> {
 }
