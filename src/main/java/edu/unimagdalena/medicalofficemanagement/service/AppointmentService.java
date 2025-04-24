@@ -2,7 +2,6 @@ package edu.unimagdalena.medicalofficemanagement.service;
 
 import edu.unimagdalena.medicalofficemanagement.model.Appointment;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
