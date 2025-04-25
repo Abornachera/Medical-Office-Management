@@ -6,25 +6,24 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class MedicalRecordDTO {
-
     private Long id;
+
+    @NotBlank
+    private String diagnosis;
+    @NotBlank
+    private String notes;
+    @NotNull
+    private LocalDateTime createdAt;
 
     @NotNull
     private Long appointmentId;
 
     @NotNull
     private Long patientId;
-
-    @NotBlank
-    private String diagnosis;
-
-    @NotBlank
-    private String notes;
-
-    private LocalDateTime createdAt;
 }

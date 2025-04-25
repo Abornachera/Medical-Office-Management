@@ -6,6 +6,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ConsultRoomMapper {
-    ConsultRoomDTO toDto(ConsultRoom room);
+    ConsultRoomDTO toDTO(ConsultRoom consultRoom);
     ConsultRoom toEntity(ConsultRoomDTO dto);
 }

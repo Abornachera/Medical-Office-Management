@@ -1,56 +1,49 @@
 package edu.unimagdalena.medicalofficemanagement.controller;
 
 import edu.unimagdalena.medicalofficemanagement.dto.MedicalRecordDTO;
-import edu.unimagdalena.medicalofficemanagement.mapper.MedicalRecordMapper;
-import edu.unimagdalena.medicalofficemanagement.model.MedicalRecord;
 import edu.unimagdalena.medicalofficemanagement.service.MedicalRecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/records")
+@RequestMapping("/api/MedicalRecord")
 @RequiredArgsConstructor
 public class MedicalRecordController {
-
     private final MedicalRecordService medicalRecordService;
-    private final MedicalRecordMapper medicalRecordMapper;
+    @PostMapping
+    public ResponseEntity<MedicalRecordDTO> createMedicalRecord(@Valid @RequestBody MedicalRecordDTO medicalRecordDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(medicalRecordService.createMedicalRecord(medicalRecordDTO));
+    }
 
     @GetMapping
-    public List<MedicalRecordDTO> findAll() {
-        return medicalRecordService.findAll().stream()
-                .map(medicalRecordMapper::toDto)
-                .toList();
+    public ResponseEntity<List<MedicalRecordDTO>> getMedicalRecords() {
+        return ResponseEntity.ok(medicalRecordService.getAllMedicalRecords());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MedicalRecordDTO> findById(@PathVariable Long id) {
-        return medicalRecordService.findById(id)
-                .map(medicalRecordMapper::toDto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<MedicalRecordDTO> getMedicalRecordById(@PathVariable Long id){
+        return ResponseEntity.ok(medicalRecordService.getMedicalRecordById(id));
     }
 
-    @GetMapping("/patient/{patientId}")
-    public List<MedicalRecordDTO> findByPatientId(@PathVariable Long patientId) {
-        return medicalRecordService.findByPatientId(patientId).stream()
-                .map(medicalRecordMapper::toDto)
-                .toList();
+    @GetMapping("patient/{patientId}")
+    public ResponseEntity<List<MedicalRecordDTO>> getMedicalRecordsByPatientId(@PathVariable Long patientId){
+        List<MedicalRecordDTO> records = medicalRecordService.getMedicalRecordsByPatientId(patientId);
+        return ResponseEntity.ok(records);
     }
 
-    @PostMapping
-    public ResponseEntity<MedicalRecordDTO> create(@Valid @RequestBody MedicalRecordDTO dto) {
-        MedicalRecord record = medicalRecordMapper.toEntity(dto);
-        MedicalRecord saved = medicalRecordService.save(record);
-        return ResponseEntity.ok(medicalRecordMapper.toDto(saved));
+    @PutMapping("/{id}")
+    public ResponseEntity<MedicalRecordDTO> updateMedicalRecord(@PathVariable Long id, @Valid @RequestBody MedicalRecordDTO medicalRecordDTO){
+        return ResponseEntity.ok(medicalRecordService.updateMedicalRecord(id, medicalRecordDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        medicalRecordService.delete(id);
+    public ResponseEntity<Void> deleteMedicalRecord(@PathVariable Long id){
+        medicalRecordService.deleteMedicalRecord(id);
         return ResponseEntity.noContent().build();
     }
 }

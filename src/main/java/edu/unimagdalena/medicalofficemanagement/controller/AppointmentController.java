@@ -1,55 +1,52 @@
 package edu.unimagdalena.medicalofficemanagement.controller;
 
 import edu.unimagdalena.medicalofficemanagement.dto.AppointmentDTO;
-import edu.unimagdalena.medicalofficemanagement.mapper.AppointmentMapper;
-import edu.unimagdalena.medicalofficemanagement.model.Appointment;
 import edu.unimagdalena.medicalofficemanagement.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/appointments")
+@RequestMapping("/api/Appointment")
 @RequiredArgsConstructor
 public class AppointmentController {
-
     private final AppointmentService appointmentService;
-    private final AppointmentMapper appointmentMapper;
+
+    @PostMapping
+    public ResponseEntity<AppointmentDTO> createAppointment(@Valid @RequestBody AppointmentDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.createAppointment(dto));
+    }
 
     @GetMapping
-    public List<AppointmentDTO> findAll() {
-        return appointmentService.findAll().stream()
-                .map(appointmentMapper::toDto)
-                .toList();
+    public ResponseEntity<List<AppointmentDTO>> getAllAppointments() {
+        return ResponseEntity.ok(appointmentService.getAllAppointments());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> findById(@PathVariable Long id) {
-        return appointmentService.findById(id)
-                .map(appointmentMapper::toDto)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.getAppointmentById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<AppointmentDTO> create(@Valid @RequestBody AppointmentDTO dto) {
-        Appointment appointment = appointmentMapper.toEntity(dto);
-        Appointment saved = appointmentService.save(appointment);
-        return ResponseEntity.ok(appointmentMapper.toDto(saved));
+    @GetMapping(params = {"doctorId", "date"})
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByDoctorId(@RequestParam Long doctorId,  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        List<AppointmentDTO> appointments = appointmentService.getAppointmentsByDoctorAndDate(doctorId, date);
+        return ResponseEntity.ok(appointments);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AppointmentDTO> update(@PathVariable Long id, @Valid @RequestBody AppointmentDTO dto) {
-        Appointment updated = appointmentService.update(id, appointmentMapper.toEntity(dto));
-        return ResponseEntity.ok(appointmentMapper.toDto(updated));
+    public ResponseEntity<AppointmentDTO> updateAppointment(@PathVariable Long id, @Valid @RequestBody AppointmentDTO dto) {
+        return ResponseEntity.ok(appointmentService.updateAppointment(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        appointmentService.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<AppointmentDTO> cancelAppointment(@PathVariable Long id) {
+        return ResponseEntity.ok(appointmentService.cancelAppointment(id));
     }
+
 }

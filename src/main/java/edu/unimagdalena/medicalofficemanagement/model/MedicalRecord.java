@@ -7,25 +7,16 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
-@Getter
 @Setter
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Table (name = "MedicalRecords")
 public class MedicalRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "appointment_id", unique = true)
-    private Appointment appointment;
-
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
 
     @NotBlank
     @Column(nullable = false)
@@ -35,8 +26,14 @@ public class MedicalRecord {
     @Column(nullable = false)
     private String notes;
 
-    @NotBlank
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime created;
 
+    @OneToOne
+    @JoinColumn(name = "IdAppointment")
+    private Appointment appointment;
+
+    @ManyToOne
+    @JoinColumn(name = "IdPatient")
+    private Patient patient;
 }

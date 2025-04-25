@@ -1,55 +1,58 @@
 package edu.unimagdalena.medicalofficemanagement.service.impl;
 
-import edu.unimagdalena.medicalofficemanagement.model.Doctor;
 import edu.unimagdalena.medicalofficemanagement.repository.DoctorRepository;
+import edu.unimagdalena.medicalofficemanagement.dto.DoctorDTO;
+import edu.unimagdalena.medicalofficemanagement.exception.ResourceNotFoundException;
+import edu.unimagdalena.medicalofficemanagement.mapper.DoctorMapper;
+import edu.unimagdalena.medicalofficemanagement.model.Doctor;
 import edu.unimagdalena.medicalofficemanagement.service.DoctorService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class DoctorServiceImpl implements DoctorService {
-
     private final DoctorRepository doctorRepository;
+    private final DoctorMapper doctorMapper;
 
+    public DoctorDTO createDoctor(DoctorDTO dto){
+        Doctor doctor = doctorMapper.toEntity(dto);
+        return doctorMapper.toDto(doctorRepository.save(doctor));
+    }
     @Override
-    public List<Doctor> findAll() {
-        return doctorRepository.findAll();
+    public List<DoctorDTO> getAllDoctors() {
+        return doctorRepository.findAll().stream().map(doctorMapper::toDto).toList();
     }
 
     @Override
-    public Optional<Doctor> findById(Long id) {
-        return doctorRepository.findById(id);
+    public DoctorDTO getDoctorById(Long id) {
+        return doctorRepository.findById(id).map(doctorMapper::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID: " + id));
     }
-
     @Override
-    public List<Doctor> findBySpecialty(String specialty) {
-        return doctorRepository.findBySpecialty(specialty);
+    public List<DoctorDTO> getDoctorsBySpecialty(String specialty){
+        List<Doctor> doctors = doctorRepository.findBySpecialtyIgnoreCase(specialty);
+        return doctors.stream().map(doctorMapper::toDto).toList();
     }
-
     @Override
-    public Doctor save(Doctor doctor) {
-        return doctorRepository.save(doctor);
-    }
-
-    @Override
-    public Doctor update(Long id, Doctor doctor) {
+    public DoctorDTO updateDoctor(Long id, DoctorDTO doctorDTO) {
         Doctor existing = doctorRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Doctor not found"));
-        existing.setFullName(doctor.getFullName());
-        existing.setEmail(doctor.getEmail());
-        existing.setSpecialty(doctor.getSpecialty());
-        existing.setAvailableFrom(doctor.getAvailableFrom());
-        existing.setAvailableTo(doctor.getAvailableTo());
-        return doctorRepository.save(existing);
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor not found with ID: " + id));
+        existing.setFullName(doctorDTO.getFullName());
+        existing.setEmail(doctorDTO.getEmail());
+        existing.setSpeciality(doctorDTO.getSpeciality());
+        existing.setAvailableFrom(doctorDTO.getAvailableFrom());
+        existing.setAvailableTo(doctorDTO.getAvailableTo());
+        return doctorMapper.toDto(doctorRepository.save(existing));
     }
 
     @Override
-    public void delete(Long id) {
+    public void deleteDoctor(Long id) {
+        if(!doctorRepository.existsById(id)) {
+            throw new ResourceNotFoundException("doctor not found with ID: " + id);
+        }
         doctorRepository.deleteById(id);
     }
 }

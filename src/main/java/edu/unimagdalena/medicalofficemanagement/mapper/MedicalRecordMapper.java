@@ -7,12 +7,11 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface MedicalRecordMapper {
-
     @Mapping(source = "appointment.id", target = "appointmentId")
     @Mapping(source = "patient.id", target = "patientId")
-    MedicalRecordDTO toDto(MedicalRecord medicalRecord);
+    MedicalRecordDTO toDTO(MedicalRecord medicalRecord);
+    @Mapping (target = "appointment", ignore = true)
+    @Mapping(target = "patient", ignore = true)
+    MedicalRecord toEntity(MedicalRecordDTO dto);
 
-    @Mapping(target = "appointment.id", source = "appointmentId")
-    @Mapping(target = "patient.id", source = "patientId")
-    MedicalRecord toEntity(MedicalRecordDTO medicalRecordDTO);
 }

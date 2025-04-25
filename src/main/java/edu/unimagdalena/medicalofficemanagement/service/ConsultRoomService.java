@@ -1,14 +1,14 @@
 package edu.unimagdalena.medicalofficemanagement.service;
 
-import edu.unimagdalena.medicalofficemanagement.model.ConsultRoom;
+
+import edu.unimagdalena.medicalofficemanagement.dto.ConsultRoomDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ConsultRoomService {
-    List<ConsultRoom> findAll();
-    Optional<ConsultRoom> findById(Long id);
-    ConsultRoom save(ConsultRoom room);
-    ConsultRoom update(Long id, ConsultRoom room);
-    void delete(Long id);
+    ConsultRoomDTO createConsultRoom(ConsultRoomDTO dto);
+    List<ConsultRoomDTO> getAllConsultRooms();
+    ConsultRoomDTO getConsultRoomById(Long id);
+    ConsultRoomDTO updateConsultRoom(Long id, ConsultRoomDTO dto);
+    void deleteConsultRoom(Long id);
 }

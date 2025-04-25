@@ -1,14 +1,13 @@
 package edu.unimagdalena.medicalofficemanagement.service;
 
-import edu.unimagdalena.medicalofficemanagement.model.Patient;
+import edu.unimagdalena.medicalofficemanagement.dto.PatientDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PatientService {
-    List<Patient> findAll();
-    Optional<Patient> findById(Long id);
-    Patient save(Patient patient);
-    Patient update(Long id, Patient patient);
-    void delete(Long id);
+    PatientDTO createPatient(PatientDTO dto);
+    List<PatientDTO> getAllPatients();
+    PatientDTO getPatientById(Long id);
+    PatientDTO updatePatient(Long id, PatientDTO dto);
+    void deletePatient(Long id);
 }

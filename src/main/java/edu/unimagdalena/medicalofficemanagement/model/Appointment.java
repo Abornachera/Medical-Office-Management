@@ -2,7 +2,6 @@ package edu.unimagdalena.medicalofficemanagement.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,29 +18,30 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "doctor_id")
-    private Doctor doctor;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "consult_room_id")
-    private ConsultRoom consultRoom;
-
-    @NotNull
     @Future
+    @Column(nullable = false)
     private LocalDateTime startTime;
 
-    @NotNull
+    @Future
+    @Column(nullable = false)
     private LocalDateTime endTime;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
-    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn (name = "IdPatient")
+    private Patient patient;
+
+    @ManyToOne
+    @JoinColumn (name = "IdConsultRoom")
+    private ConsultRoom consultRoom;
+
+    @ManyToOne
+    @JoinColumn (name = "IdDoctor")
+    private Doctor doctor;
+
+    @OneToOne(mappedBy = "appointment")
     private MedicalRecord medicalRecord;
 }

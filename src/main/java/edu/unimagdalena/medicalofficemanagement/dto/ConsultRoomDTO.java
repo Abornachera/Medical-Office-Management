@@ -1,20 +1,24 @@
 package edu.unimagdalena.medicalofficemanagement.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Data
-@Builder
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ConsultRoomDTO {
     private Long id;
 
     @NotBlank
     private String name;
 
-    @NotBlank
-    private String floor;
+    @NotNull
+    private int floor;
 
+    @NotBlank
     private String description;
+
 }

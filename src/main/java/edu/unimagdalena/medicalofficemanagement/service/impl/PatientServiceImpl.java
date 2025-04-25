@@ -1,48 +1,53 @@
 package edu.unimagdalena.medicalofficemanagement.service.impl;
 
-import edu.unimagdalena.medicalofficemanagement.model.Patient;
 import edu.unimagdalena.medicalofficemanagement.repository.PatientRepository;
+import edu.unimagdalena.medicalofficemanagement.dto.PatientDTO;
+import edu.unimagdalena.medicalofficemanagement.exception.ResourceNotFoundException;
+import edu.unimagdalena.medicalofficemanagement.mapper.PatientMapper;
+import edu.unimagdalena.medicalofficemanagement.model.Patient;
 import edu.unimagdalena.medicalofficemanagement.service.PatientService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PatientServiceImpl implements PatientService {
-
     private final PatientRepository patientRepository;
+    private final PatientMapper patientMapper;
 
     @Override
-    public List<Patient> findAll() {
-        return patientRepository.findAll();
+    public PatientDTO createPatient(PatientDTO patientDTO) {
+        Patient patient = patientMapper.toEntity(patientDTO);
+        return patientMapper.toDTO(patientRepository.save(patient));
     }
 
     @Override
-    public Optional<Patient> findById(Long id) {
-        return patientRepository.findById(id);
+    public List<PatientDTO> getAllPatients() {
+        return patientRepository.findAll().stream().map(patientMapper::toDTO).toList();
     }
 
     @Override
-    public Patient save(Patient patient) {
-        return patientRepository.save(patient);
+    public PatientDTO getPatientById(Long id) {
+        return patientRepository.findById(id).map(patientMapper::toDTO).orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
     }
 
     @Override
-    public Patient update(Long id, Patient patient) {
+    public PatientDTO updatePatient(Long id, PatientDTO patientDTO) {
         Patient existing = patientRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
-        existing.setFullName(patient.getFullName());
-        existing.setEmail(patient.getEmail());
-        existing.setPhone(patient.getPhone());
-        return patientRepository.save(existing);
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + id));
+        existing.setFullName(patientDTO.getFullName());
+        existing.setEmail(patientDTO.getEmail());
+        existing.setPhone(patientDTO.getPhone());
+        return patientMapper.toDTO(patientRepository.save(existing));
     }
 
     @Override
-    public void delete(Long id) {
+    public void deletePatient(Long id) {
+        if(!patientRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Patient not found with ID: " + id);
+        }
         patientRepository.deleteById(id);
     }
 }

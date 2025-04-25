@@ -1,32 +1,31 @@
 package edu.unimagdalena.medicalofficemanagement.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Data
-@Builder
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class DoctorDTO {
-
     private Long id;
 
     @NotBlank
     private String fullName;
 
-    @Email
     @NotBlank
     private String email;
 
-    private String specialty;
+    private String speciality;
 
-    @Future
+    @NotNull
     private LocalTime availableFrom;
-
-    @Future
+    @NotNull
     private LocalTime availableTo;
 
 }

@@ -1,18 +1,19 @@
 package edu.unimagdalena.medicalofficemanagement.exception;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@ControllerAdvice
-public class GlobalExceptionHandler {
 
+@RestControllerAdvice
+
+public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> fieldErrors = new HashMap<>();
@@ -54,8 +55,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(AppointmentNotFoundException.class)
-    public ResponseEntity<ApiError> handleAppointmentNotFound(AppointmentNotFoundException ex) {
+    @ExceptionHandler(ApiError.ResourceNotFoundException.class)
+    public ResponseEntity<ApiError> handleResourceNotFound(ApiError.ResourceNotFoundException ex) {
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
@@ -66,8 +67,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ConsultRoomNotFoundException.class)
-    public ResponseEntity<ApiError> handleConsultRoomNotFound(ConsultRoomNotFoundException ex) {
+    @ExceptionHandler(ConsultRoomAlreadyAppointmentException.class)
+    public ResponseEntity<ApiError> handleRoomAlreadyBooked(ConsultRoomAlreadyAppointmentException ex) {
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.CONFLICT.value())
@@ -78,52 +79,51 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(DoctorNotFoundException.class)
-    public ResponseEntity<ApiError> handleDoctorNotFound(DoctorNotFoundException ex) {
+    @ExceptionHandler(InvalidAppointmentException.class)
+    public ResponseEntity<ApiError> handleInvalidAppointment(InvalidAppointmentException ex) {
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
                 .errors(null)
                 .build();
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MedicalRecordNotFoundException.class)
-    public ResponseEntity<ApiError> handleMedicalRecordNotFound(MedicalRecordNotFoundException ex) {
+    @ExceptionHandler(InvalidAppointmentDoctor.class)
+    public ResponseEntity<ApiError> handleInvalidAppointmentDoctor(InvalidAppointmentDoctor ex) {
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
                 .errors(null)
                 .build();
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(PatientNotFoundException.class)
-    public ResponseEntity<ApiError> handlePatientNotFound(PatientNotFoundException ex) {
+    @ExceptionHandler(InvalidAppointmentTime.class)
+    public ResponseEntity<ApiError> handleInvalidAppointmentTime(InvalidAppointmentTime ex) {
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
                 .errors(null)
                 .build();
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(AppointmentAlreadyExistException.class)
-    public ResponseEntity<ApiError> handleAppointmentAlreadyExist(AppointmentAlreadyExistException ex) {
+    @ExceptionHandler(StatusAppointmentCompletedException.class)
+    public ResponseEntity<ApiError> handleAppointmentCompleted(StatusAppointmentCompletedException ex) {
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
+                .status(HttpStatus.BAD_REQUEST.value())
                 .message(ex.getMessage())
                 .errors(null)
                 .build();
 
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
-
 }

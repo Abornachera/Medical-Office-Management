@@ -12,7 +12,13 @@ import java.util.Map;
 @Builder
 public class ApiError {
     private LocalDateTime timestamp;
-    private String message;
     private int status;
+    private String message;
     private Map<String, String> errors;
+
+    public static class ResourceNotFoundException extends RuntimeException {
+        public ResourceNotFoundException(String message) {
+            super(message);
+        }
+    }
 }

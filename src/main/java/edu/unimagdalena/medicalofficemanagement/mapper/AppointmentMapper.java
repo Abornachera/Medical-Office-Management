@@ -7,14 +7,14 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface AppointmentMapper {
-
     @Mapping(source = "patient.id", target = "patientId")
-    @Mapping(source = "doctor.id", target = "doctorId")
     @Mapping(source = "consultRoom.id", target = "consultRoomId")
-    AppointmentDTO toDto(Appointment appointment);
+    @Mapping(source = "doctor.id", target = "doctorId")
+    AppointmentDTO toDTO(Appointment appointment);
 
-    @Mapping(target = "patient.id", source = "patientId")
-    @Mapping(target = "doctor.id", source = "doctorId")
-    @Mapping(target = "consultRoom.id", source = "consultRoomId")
-    Appointment toEntity(AppointmentDTO appointmentDTO);
+    @Mapping(target = "patient", ignore = true)
+    @Mapping(target = "consultRoom", ignore = true)
+    @Mapping(target = "doctor", ignore = true)
+    Appointment toEntity(AppointmentDTO dto);
+
 }
