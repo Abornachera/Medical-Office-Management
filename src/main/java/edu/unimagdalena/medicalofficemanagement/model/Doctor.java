@@ -6,34 +6,38 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table (name = "Doctors")
 public class Doctor {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
+    @Column(nullable = false)
     private String fullName;
 
     @Email
     @NotBlank
+    @Column(nullable = false)
     private String email;
 
-    @NotBlank
-    private String specialty;
+    private String speciality;
 
+    @Column(nullable = false)
     private LocalTime availableFrom;
 
+    @Column(nullable = false)
     private LocalTime availableTo;
 
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Appointment> appointments = new HashSet<>();
+    @OneToMany(mappedBy = "doctor")
+    private Set<Appointment> appointments;
 }

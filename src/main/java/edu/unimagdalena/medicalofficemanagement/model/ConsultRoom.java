@@ -4,27 +4,32 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table (name = "ConsultRooms")
 public class ConsultRoom {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
+    @Column(nullable = false)
     private String name;
 
-    private String floor;
+    @Column(nullable = false)
+    private int floor;
 
+    @NotBlank
+    @Column(nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "consultRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Appointment> appointments = new HashSet<>();
+    @OneToMany (mappedBy = "consultRoom")
+    private Set<Appointment> appointments;
 }

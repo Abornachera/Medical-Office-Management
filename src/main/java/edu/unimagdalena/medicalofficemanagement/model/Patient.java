@@ -5,32 +5,36 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Setter
+@Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
+@Table (name = "Patients")
 public class Patient {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
+    @Column(nullable = false)
     private String fullName;
 
     @Email
     @NotBlank
+    @Column(nullable = false)
     private String email;
 
+    @NotBlank
+    @Column(nullable = false)
     private String phone;
 
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<MedicalRecord> medicalRecords = new HashSet<>();
+    @OneToMany(mappedBy = "patient")
+    private Set<MedicalRecord> medicalRecords;
 
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Appointment> appointments = new HashSet<>();
+    @OneToMany(mappedBy = "patient")
+    private Set<Appointment> appointments;
 }
