@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/Appointment")
+@RequestMapping("/api/v1/Appointment")
 @RequiredArgsConstructor
 public class AppointmentController {
     private final AppointmentService appointmentService;
