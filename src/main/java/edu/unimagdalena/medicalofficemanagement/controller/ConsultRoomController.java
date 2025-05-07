@@ -1,5 +1,7 @@
 package edu.unimagdalena.medicalofficemanagement.controller;
 
+import edu.unimagdalena.medicalofficemanagement.dto.request.ConsultRoomDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.ConsultRoomDtoResponse;
 import edu.unimagdalena.medicalofficemanagement.service.ConsultRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,30 +12,36 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/ConsultRoom")
+@RequestMapping("/api/v1/rooms")
 @RequiredArgsConstructor
 public class ConsultRoomController {
+
     private final ConsultRoomService consultRoomService;
 
-    @PostMapping
-    public ResponseEntity<ConsultRoomDTO> createConsultRoom(@Valid @RequestBody ConsultRoomDTO dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(consultRoomService.createConsultRoom(dto));
-    }
     @GetMapping
-    public ResponseEntity<List<ConsultRoomDTO>> getAllConsultRooms() {
-        return ResponseEntity.status(HttpStatus.OK).body(consultRoomService.getAllConsultRooms());
+    public ResponseEntity<List<ConsultRoomDtoResponse>> getAllConsultRooms() {
+        return ResponseEntity.ok(consultRoomService.findAllConsultRooms());
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ConsultRoomDTO> getConsultRoomById(@PathVariable Long id) {
-        return ResponseEntity.ok(consultRoomService.getConsultRoomById(id));
+    public ResponseEntity<ConsultRoomDtoResponse> getConsultRoomById(@PathVariable Long id){
+        return ResponseEntity.ok(consultRoomService.findConsultRoomById(id));
     }
+
+    @PostMapping
+    public ResponseEntity<ConsultRoomDtoResponse> createConsultRoom(@Valid @RequestBody ConsultRoomDtoRequest consultRoomDtoRequest){
+        return ResponseEntity.status(HttpStatus.CREATED).body(consultRoomService.saveConsultRoom(consultRoomDtoRequest));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<ConsultRoomDTO> updateConsultRoom(@PathVariable Long id, @Valid @RequestBody ConsultRoomDTO dto) {
-        return ResponseEntity.ok(consultRoomService.updateConsultRoom(id, dto));
+    public ResponseEntity<ConsultRoomDtoResponse> updateConsultRoom(@PathVariable Long id, @Valid @RequestBody ConsultRoomDtoRequest consultRoomDtoRequest){
+        return ResponseEntity.ok(consultRoomService.updateConsultRoom(id, consultRoomDtoRequest));
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteConsultRoom(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteConsultRoom(@PathVariable Long id){
         consultRoomService.deleteConsultRoom(id);
         return ResponseEntity.noContent().build();
     }
+
 }
