@@ -1,15 +1,18 @@
 package edu.unimagdalena.medicalofficemanagement.exception.handler;
 
-import edu.unimagdalena.medicalofficemanagement.exception.AppointmentAlreadyCompletedException;
+import edu.unimagdalena.medicalofficemanagement.exception.*;
+import edu.unimagdalena.medicalofficemanagement.exception.notFound.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
