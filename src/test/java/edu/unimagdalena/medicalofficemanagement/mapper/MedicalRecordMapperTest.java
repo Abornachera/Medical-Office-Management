@@ -7,6 +7,8 @@ import edu.unimagdalena.medicalofficemanagement.model.MedicalRecord;
 import edu.unimagdalena.medicalofficemanagement.model.Patient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+
 import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,7 +18,7 @@ class MedicalRecordMapperTest {
 
     @BeforeEach
     void setUp() {
-        mapper = new MedicalRecordMapperImpl();
+        mapper = Mappers.getMapper(MedicalRecordMapper.class); //Esto busca la implementación generada por MapStruct automáticamente en tiempo de ejecución.
     }
 
     @Test

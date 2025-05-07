@@ -6,6 +6,7 @@ import edu.unimagdalena.medicalofficemanagement.dto.response.AppointmentDtoRespo
 import edu.unimagdalena.medicalofficemanagement.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +18,7 @@ class AppointmentMapperTest {
 
     @BeforeEach
     void setUp() {
-        mapper = new AppointmentMapperImpl();
+        mapper = Mappers.getMapper(AppointmentMapper.class); //Esto busca la implementación generada por MapStruct automáticamente en tiempo de ejecución.
     }
 
     @Test

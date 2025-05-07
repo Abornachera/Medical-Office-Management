@@ -5,6 +5,7 @@ import edu.unimagdalena.medicalofficemanagement.dto.response.ConsultRoomDtoRespo
 import edu.unimagdalena.medicalofficemanagement.model.ConsultRoom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +15,7 @@ class ConsultRoomMapperTest {
 
     @BeforeEach
     void setUp() {
-        mapper = new ConsultRoomMapperImpl();
+        mapper = Mappers.getMapper(ConsultRoomMapper.class); //Esto busca la implementación generada por MapStruct automáticamente en tiempo de ejecución.
     }
 
     @Test
