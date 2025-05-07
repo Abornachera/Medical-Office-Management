@@ -1,6 +1,5 @@
 package edu.unimagdalena.medicalofficemanagement.mapper;
 
-import edu.unimagdalena.medicalofficemanagement.dto.AppointmentDTO;
 import edu.unimagdalena.medicalofficemanagement.model.Appointment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

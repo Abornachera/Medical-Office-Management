@@ -1,6 +1,5 @@
 package edu.unimagdalena.medicalofficemanagement.mapper;
 
-import edu.unimagdalena.medicalofficemanagement.dto.ConsultRoomDTO;
 import edu.unimagdalena.medicalofficemanagement.model.ConsultRoom;
 import org.mapstruct.Mapper;
 

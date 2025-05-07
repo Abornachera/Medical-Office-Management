@@ -1,7 +1,6 @@
 package edu.unimagdalena.medicalofficemanagement.service.impl;
 
 import edu.unimagdalena.medicalofficemanagement.repository.ConsultRoomRepository;
-import edu.unimagdalena.medicalofficemanagement.dto.ConsultRoomDTO;
 import edu.unimagdalena.medicalofficemanagement.exception.ResourceNotFoundException;
 import edu.unimagdalena.medicalofficemanagement.mapper.ConsultRoomMapper;
 import edu.unimagdalena.medicalofficemanagement.model.ConsultRoom;

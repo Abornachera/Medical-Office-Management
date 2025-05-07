@@ -4,7 +4,6 @@ import edu.unimagdalena.medicalofficemanagement.repository.AppointmentRepository
 import edu.unimagdalena.medicalofficemanagement.repository.ConsultRoomRepository;
 import edu.unimagdalena.medicalofficemanagement.repository.DoctorRepository;
 import edu.unimagdalena.medicalofficemanagement.repository.PatientRepository;
-import edu.unimagdalena.medicalofficemanagement.dto.AppointmentDTO;
 
 import edu.unimagdalena.medicalofficemanagement.exception.*;
 import edu.unimagdalena.medicalofficemanagement.mapper.AppointmentMapper;

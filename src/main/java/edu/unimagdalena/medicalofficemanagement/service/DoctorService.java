@@ -1,7 +1,5 @@
 package edu.unimagdalena.medicalofficemanagement.service;
 
-import edu.unimagdalena.medicalofficemanagement.dto.DoctorDTO;
-
 import java.util.List;
 
 public interface DoctorService {
