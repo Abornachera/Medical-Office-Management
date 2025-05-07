@@ -1,4 +1,4 @@
-package edu.unimagdalena.medicalofficemanagement.config.security;
+package edu.unimagdalena.medicalofficemanagement.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
