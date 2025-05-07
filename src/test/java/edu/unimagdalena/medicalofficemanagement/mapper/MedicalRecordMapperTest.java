@@ -1,315 +1,66 @@
 package edu.unimagdalena.medicalofficemanagement.mapper;
 
-import edu.unimagdalena.medicalofficemanagement.model.*;
-import edu.unimagdalena.medicalofficemanagement.repository.*;
+import edu.unimagdalena.medicalofficemanagement.dto.request.MedicalRecordDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.MedicalRecordDtoResponse;
+import edu.unimagdalena.medicalofficemanagement.model.Appointment;
+import edu.unimagdalena.medicalofficemanagement.model.MedicalRecord;
+import edu.unimagdalena.medicalofficemanagement.model.Patient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.junit.jupiter.api.Assertions.*;
+class MedicalRecordMapperTest {
 
-class MedicalRecordRepositoryTest {
+    private MedicalRecordMapper mapper;
 
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15")
-            .withDatabaseName("testPostgres")
-            .withUsername("testUsername")
-            .withPassword("testPassword");
-
-    @Autowired
-    private MedicalRecordRepository medicalRecordRepository;
-
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private PatientRepository patientRepository;
-    @Autowired
-    private DoctorRepository doctorRepository;
-    @Autowired
-    private ConsultRoomRepository consultRoomRepository;
-
-    @Test
-    void shouldSaveMedicalRecordAndFind() {
-
-        Patient patient = patientRepository.save(
-                Patient.builder()
-                        .fullName("Juan Pérez")
-                        .email("juan.perez@example.com")
-                        .phone("+573001234567")
-                        .build());
-
-
-        // Crear Doctor
-        Doctor doctor = doctorRepository.save(
-                Doctor.builder()
-                        .fullName("Dra. María González")
-                        .email("maria.gonzalez@clinica.com")
-                        .speciality("Cardiología")
-                        .availableFrom(LocalTime.of(8, 0))
-                        .availableTo(LocalTime.of(17, 0))
-                        .build());
-
-        // Crear ConsultRoom
-        ConsultRoom consultRoom = consultRoomRepository.save(
-                ConsultRoom.builder()
-                        .name("Consulta 101")
-                        .floor("1")
-                        .description("Consultorio de Cardiología")
-                        .build());
-
-        // Crear Appointment
-        Appointment appointment = appointmentRepository.save(
-                Appointment.builder()
-                        .patient(patient)
-                        .doctor(doctor)
-                        .consultRoom(consultRoom)
-                        .startTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0))
-                        .endTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(30))
-                        .status(AppointmentStatus.SCHEDULED)
-                        .build());
-
-        MedicalRecord medicalRecord = MedicalRecord.builder()
-                .patient(patient)
-                .appointment(appointment)
-                .diagnosis("Enfermo")
-                .notes("Sintomas leves")
-                .createdAt(LocalDateTime.of(2025, 4, 18, 14, 0))
-                .build();
-
-        MedicalRecord saved = medicalRecordRepository.save(medicalRecord);
-
-        Optional<MedicalRecord> result = medicalRecordRepository.findById(saved.getIdMedicalRecord());
-
-        assertTrue(result.isPresent());
-        assertEquals("Juan Pérez", result.get().getPatient().getFullName());
+    @BeforeEach
+    void setUp() {
+        mapper = new MedicalRecordMapperImpl();
     }
 
     @Test
-    void shouldFindAllMedicalRecords(){
-        Patient patient = patientRepository.save(
-                Patient.builder()
-                        .fullName("Juan Pérez")
-                        .email("juan.perez@example.com")
-                        .phone("+573001234567")
-                        .build());
-
-        Patient patient1 = patientRepository.save(
-                Patient.builder()
-                        .fullName("Pedro Rodriguez")
-                        .email("pedro.rodriguez@example.com")
-                        .phone("+573014567890")
-                        .build());
-
-
-        // Crear Doctor
-        Doctor doctor = doctorRepository.save(
-                Doctor.builder()
-                        .fullName("María González")
-                        .email("maria.gonzalez@clinica.com")
-                        .speciality("Cardiología")
-                        .availableFrom(LocalTime.of(8, 0))
-                        .availableTo(LocalTime.of(17, 0))
-                        .build());
-
-        // Crear ConsultRoom
-        ConsultRoom consultRoom = consultRoomRepository.save(
-                ConsultRoom.builder()
-                        .name("Consulta 101")
-                        .floor("1")
-                        .description("Consultorio de Cardiología")
-                        .build());
-
-        // Crear Appointment
-        Appointment appointment = appointmentRepository.save(
-                Appointment.builder()
-                        .patient(patient)
-                        .doctor(doctor)
-                        .consultRoom(consultRoom)
-                        .startTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0))
-                        .endTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(30))
-                        .status(AppointmentStatus.SCHEDULED)
-                        .build());
-
-        Appointment appointment1 = appointmentRepository.save(
-                Appointment.builder()
-                        .patient(patient1)
-                        .doctor(doctor)
-                        .consultRoom(consultRoom)
-                        .startTime(LocalDateTime.now().plusDays(2).withHour(10).withMinute(0))
-                        .endTime(LocalDateTime.now().plusDays(2).withHour(10).withMinute(30))
-                        .status(AppointmentStatus.SCHEDULED)
-                        .build());
-
-        MedicalRecord medicalRecord = MedicalRecord.builder()
+    void toMedicalRecordDtoResponse_shouldMapAllFields() {
+        Patient patient = Patient.builder().idPatient(1L).build();
+        Appointment appointment = Appointment.builder().idAppointment(2L).build();
+        LocalDateTime createdAt = LocalDateTime.of(2024, 5, 1, 14, 30);
+        MedicalRecord record = MedicalRecord.builder()
+                .idMedicalRecord(100L)
                 .patient(patient)
                 .appointment(appointment)
-                .diagnosis("Enfermo")
-                .notes("Sintomas leves")
-                .createdAt(LocalDateTime.of(2025, 4, 18, 14, 0))
+                .diagnosis("Hipertensión arterial")
+                .notes("Control cada 3 meses")
+                .createdAt(createdAt)
                 .build();
 
-        MedicalRecord medicalRecord1 = MedicalRecord.builder().
-                patient(patient1).
-                appointment(appointment1).
-                diagnosis("Epicondilitis medial").
-                notes("Dolor leve").
-                createdAt(LocalDateTime.of(2024, 12, 20, 13, 55)).
-                build();
+        MedicalRecordDtoResponse dto = mapper.toMedicalRecordDtoResponse(record);
 
-        medicalRecordRepository.save(medicalRecord);
-        medicalRecordRepository.save(medicalRecord1);
-
-        List<MedicalRecord> results = medicalRecordRepository.findAll();
-
-        assertEquals(2, results.size());
-
-    }
-
-
-
-    @Test
-    void findAllByPatient_IdPatient() {
-        Patient patient = patientRepository.save(
-                Patient.builder()
-                        .fullName("Juan Pérez")
-                        .email("juan.perez@example.com")
-                        .phone("+573001234567")
-                        .build());
-
-        Optional<Patient> resultPatient = patientRepository.findById(patient.getIdPatient());
-        Long id = resultPatient.get().getIdPatient();
-
-
-        // Crear Doctor
-        Doctor doctor = doctorRepository.save(
-                Doctor.builder()
-                        .fullName("María González")
-                        .email("maria.gonzalez@clinica.com")
-                        .speciality("Cardiología")
-                        .availableFrom(LocalTime.of(8, 0))
-                        .availableTo(LocalTime.of(17, 0))
-                        .build());
-
-        // Crear ConsultRoom
-        ConsultRoom consultRoom = consultRoomRepository.save(
-                ConsultRoom.builder()
-                        .name("Consulta 101")
-                        .floor("1")
-                        .description("Consultorio de Cardiología")
-                        .build());
-
-        // Crear Appointment
-        Appointment appointment = appointmentRepository.save(
-                Appointment.builder()
-                        .patient(patient)
-                        .doctor(doctor)
-                        .consultRoom(consultRoom)
-                        .startTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0))
-                        .endTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(30))
-                        .status(AppointmentStatus.SCHEDULED)
-                        .build());
-
-        Appointment appointment1 = appointmentRepository.save(
-                Appointment.builder()
-                        .patient(patient)
-                        .doctor(doctor)
-                        .consultRoom(consultRoom)
-                        .startTime(LocalDateTime.now().plusDays(2).withHour(10).withMinute(0))
-                        .endTime(LocalDateTime.now().plusDays(2).withHour(10).withMinute(30))
-                        .status(AppointmentStatus.SCHEDULED)
-                        .build());
-
-        MedicalRecord medicalRecord = MedicalRecord.builder()
-                .patient(patient)
-                .appointment(appointment)
-                .diagnosis("Enfermo")
-                .notes("Sintomas leves")
-                .createdAt(LocalDateTime.of(2025, 4, 18, 14, 0))
-                .build();
-
-        MedicalRecord medicalRecord1 = MedicalRecord.builder().
-                patient(patient).
-                appointment(appointment1).
-                diagnosis("Epicondilitis medial").
-                notes("Dolor leve").
-                createdAt(LocalDateTime.of(2024, 12, 20, 13, 55)).
-                build();
-
-        medicalRecordRepository.save(medicalRecord);
-        medicalRecordRepository.save(medicalRecord1);
-
-        List<MedicalRecord> results = medicalRecordRepository.findByPatientId(id);
-
-        assertEquals(2, results.size());
-        assertFalse(results.isEmpty());
-
+        assertThat(dto.idMedicalRecord()).isEqualTo(record.getIdMedicalRecord());
+        assertThat(dto.idPatient()).isEqualTo(record.getPatient().getIdPatient());
+        assertThat(dto.idAppointment()).isEqualTo(record.getAppointment().getIdAppointment());
+        assertThat(dto.diagnosis()).isEqualTo(record.getDiagnosis());
+        assertThat(dto.notes()).isEqualTo(record.getNotes());
+        assertThat(dto.createdAt()).isEqualTo(record.getCreatedAt());
     }
 
     @Test
-    void shouldDeleteMedicalRecord(){
-        Patient patient = patientRepository.save(
-                Patient.builder()
-                        .fullName("Juan Pérez")
-                        .email("juan.perez@example.com")
-                        .phone("+573001234567")
-                        .build());
+    void toEntity_shouldMapFieldsExceptIdAndRelations() {
+        LocalDateTime createdAt = LocalDateTime.of(2024, 5, 2, 10, 15);
+        MedicalRecordDtoRequest dtoRequest = new MedicalRecordDtoRequest(
+                3L,
+                4L,
+                "Diabetes tipo II",
+                "Revisión trimestral de glucemia",
+                createdAt
+        );
 
+        MedicalRecord entity = mapper.toEntity(dtoRequest);
 
-        // Crear Doctor
-        Doctor doctor = doctorRepository.save(
-                Doctor.builder()
-                        .fullName("Dra. María González")
-                        .email("maria.gonzalez@clinica.com")
-                        .speciality("Cardiología")
-                        .availableFrom(LocalTime.of(8, 0))
-                        .availableTo(LocalTime.of(17, 0))
-                        .build());
-
-        // Crear ConsultRoom
-        ConsultRoom consultRoom = consultRoomRepository.save(
-                ConsultRoom.builder()
-                        .name("Consulta 101")
-                        .floor("1")
-                        .description("Consultorio de Cardiología")
-                        .build());
-
-        // Crear Appointment
-        Appointment appointment = appointmentRepository.save(
-                Appointment.builder()
-                        .patient(patient)
-                        .doctor(doctor)
-                        .consultRoom(consultRoom)
-                        .startTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(0))
-                        .endTime(LocalDateTime.now().plusDays(1).withHour(10).withMinute(30))
-                        .status(AppointmentStatus.SCHEDULED)
-                        .build());
-
-        MedicalRecord medicalRecord = MedicalRecord.builder()
-                .patient(patient)
-                .appointment(appointment)
-                .diagnosis("Enfermo")
-                .notes("Sintomas leves")
-                .createdAt(LocalDateTime.of(2025, 4, 18, 14, 0))
-                .build();
-
-        MedicalRecord saved = medicalRecordRepository.save(medicalRecord);
-
-        Long id = saved.getIdMedicalRecord();
-
-        medicalRecordRepository.deleteById(id);
-
-        assertFalse(medicalRecordRepository.findById(id).isPresent());
+        assertThat(entity.getIdMedicalRecord()).isNull();
+        assertThat(entity.getPatient()).isNull();
+        assertThat(entity.getAppointment()).isNull();
+        assertThat(entity.getDiagnosis()).isEqualTo(dtoRequest.diagnosis());
+        assertThat(entity.getNotes()).isEqualTo(dtoRequest.notes());
+        assertThat(entity.getCreatedAt()).isEqualTo(dtoRequest.createdAt());
     }
 }

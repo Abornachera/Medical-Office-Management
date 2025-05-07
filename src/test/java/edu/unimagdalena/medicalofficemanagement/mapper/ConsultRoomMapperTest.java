@@ -1,6 +1,7 @@
 package edu.unimagdalena.medicalofficemanagement.mapper;
 
 import edu.unimagdalena.medicalofficemanagement.dto.request.ConsultRoomDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.ConsultRoomDtoResponse;
 import edu.unimagdalena.medicalofficemanagement.model.ConsultRoom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

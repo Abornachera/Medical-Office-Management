@@ -1,89 +1,52 @@
 package edu.unimagdalena.medicalofficemanagement.mapper;
 
+import edu.unimagdalena.medicalofficemanagement.dto.request.PatientDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.PatientDtoResponse;
 import edu.unimagdalena.medicalofficemanagement.model.Patient;
-import edu.unimagdalena.medicalofficemanagement.repository.PatientRepository;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.w3c.dom.stylesheets.LinkStyle;
 
-import java.util.List;
-import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.junit.jupiter.api.Assertions.*;
+class PatientMapperTest {
 
-@DataJpaTest
-@Testcontainers
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class PatientRepositoryTest {
+    private PatientMapper mapper;
 
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:15")
-            .withDatabaseName("testPostgres")
-            .withUsername("testUsername")
-            .withPassword("testPassword");
-
-    @Autowired
-    private PatientRepository patientRepository;
-
-    @Test
-    void shouldSaveAndFindPatient(){
-        Patient patient = Patient.builder().fullName("Pedro Pérez").email("prueba@test.com").phone("3204567890").build();
-        Patient saved = patientRepository.save(patient);
-
-        Optional<Patient> result = patientRepository.findById(saved.getIdPatient());
-
-        Assertions.assertEquals("Pedro Pérez", result.get().getFullName());
-        Assertions.assertTrue(result.isPresent());
+    @BeforeEach
+    void setUp() {
+        mapper = new PatientMapperImpl();
     }
 
     @Test
-    void shouldFindAllPatient(){
-        patientRepository.save(Patient.builder().fullName("Andrés Escobar").email("test@gmail.com").phone("3103334455").build());
-        patientRepository.save(Patient.builder().fullName("Mateo Angulo").email("mateo@test.com").phone("3001112233").build());
+    void toPatientDtoResponse_shouldMapAllFields() {
+        Patient patient = Patient.builder()
+                .idPatient(1L)
+                .fullName("Luis Gómez")
+                .email("luis.gomez@example.com")
+                .phone("3001234567")
+                .build();
 
-        List<Patient> patients = patientRepository.findAll();
+        PatientDtoResponse dto = mapper.toPatientDtoResponse(patient);
 
-        Assertions.assertEquals(2, patients.size());
-
-
-    }
-    @Test
-    void findByEmail() {
-
-        Patient patient2 = Patient.builder().fullName("Juan Camilo").email("pilar@test.com").phone("3204567800").build();
-
-        patientRepository.save(patient2);
-        Patient result = patientRepository.findByEmail("pilar@test.com");
-        Assertions.assertEquals("3204567800", result.getPhone());
-
-
+        assertThat(dto.idPatient()).isEqualTo(patient.getIdPatient());
+        assertThat(dto.fullName()).isEqualTo(patient.getFullName());
+        assertThat(dto.email()).isEqualTo(patient.getEmail());
+        assertThat(dto.phone()).isEqualTo(patient.getPhone());
     }
 
     @Test
-    void shouldUpdatePatient(){
-        Patient patient = Patient.builder().fullName("Pedro Pérez").email("prueba@test.com").phone("3204567890").build();
-        patient.setPhone("3103838223");
-        Patient result = patientRepository.save(patient);
-        Assertions.assertEquals("3103838223", result.getPhone());
+    void toEntity_shouldMapFieldsExceptId() {
+        PatientDtoRequest dtoRequest = new PatientDtoRequest(
+                "Ana Torres",
+                "ana.torres@example.com",
+                "3117654321"
+        );
 
-    }
+        Patient entity = mapper.toEntity(dtoRequest);
 
-    @Test
-    void shouldDeletePatient(){
-        Patient patient = Patient.builder().fullName("Pedro Pérez").email("prueba@test.com").phone("3204567890").build();
-        Patient saved = patientRepository.save(patient);
-        Long id = saved.getIdPatient();
-        patientRepository.deleteById(id);
-
-        Assertions.assertFalse(patientRepository.findById(id).isPresent());
-
+        assertThat(entity.getIdPatient()).isNull();
+        assertThat(entity.getFullName()).isEqualTo(dtoRequest.fullName());
+        assertThat(entity.getEmail()).isEqualTo(dtoRequest.email());
+        assertThat(entity.getPhone()).isEqualTo(dtoRequest.phone());
     }
 }
