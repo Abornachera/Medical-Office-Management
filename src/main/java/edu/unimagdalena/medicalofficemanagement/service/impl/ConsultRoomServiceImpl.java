@@ -1,5 +1,8 @@
 package edu.unimagdalena.medicalofficemanagement.service.impl;
 
+import edu.unimagdalena.medicalofficemanagement.dto.request.ConsultRoomDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.ConsultRoomDtoResponse;
+import edu.unimagdalena.medicalofficemanagement.exception.notFound.ConsultRoomNotFoundException;
 import edu.unimagdalena.medicalofficemanagement.repository.ConsultRoomRepository;
 import edu.unimagdalena.medicalofficemanagement.mapper.ConsultRoomMapper;
 import edu.unimagdalena.medicalofficemanagement.model.ConsultRoom;
@@ -12,42 +15,49 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ConsultRoomServiceImpl implements ConsultRoomService {
-    private final ConsultRoomRepository consultRoomRepository;
-    private final ConsultRoomMapper consultRoomMapper;
+
+    private ConsultRoomRepository consultRoomRepository;
+    private ConsultRoomMapper consultRoomMapper;
 
     @Override
-    public ConsultRoomDTO createConsultRoom(ConsultRoomDTO dto) {
-        ConsultRoom room = consultRoomMapper.toEntity(dto);
-        return consultRoomMapper.toDTO(consultRoomRepository.save(room));
+    public List<ConsultRoomDtoResponse> findAllConsultRooms() {
+        return consultRoomRepository.findAll().stream()
+                .map(consultRoomMapper::toConsultRoomDtoResponse)
+                .toList();
     }
 
     @Override
-    public List<ConsultRoomDTO> getAllConsultRooms() {
-        return consultRoomRepository.findAll().stream().map(consultRoomMapper::toDTO).toList();
+    public ConsultRoomDtoResponse findConsultRoomById(Long id) {
+        ConsultRoom consultRoom = consultRoomRepository.findById(id)
+                .orElseThrow(() -> new ConsultRoomNotFoundException("Consult Room with ID: " + id + " Not Found"));
+
+        return consultRoomMapper.toConsultRoomDtoResponse(consultRoom);
     }
 
     @Override
-    public ConsultRoomDTO getConsultRoomById(Long id) {
-        return consultRoomRepository.findById(id)
-                .map(consultRoomMapper::toDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Consult Room not found with ID: " + id));
+    public ConsultRoomDtoResponse saveConsultRoom(ConsultRoomDtoRequest consultRoomDtoRequest) {
+        ConsultRoom toBeSaved = consultRoomMapper.toEntity(consultRoomDtoRequest);
+        return consultRoomMapper.toConsultRoomDtoResponse(consultRoomRepository.save(toBeSaved));
     }
 
     @Override
-    public ConsultRoomDTO updateConsultRoom(Long id, ConsultRoomDTO dto) {
-        ConsultRoom existing = consultRoomRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Consult Room not found with ID: " + id));
-        existing.setName(dto.getName());
-        existing.setDescription(dto.getDescription());
-        existing.setFloor(dto.getFloor());
-        return consultRoomMapper.toDTO(consultRoomRepository.save(existing));
+    public ConsultRoomDtoResponse updateConsultRoom(Long id, ConsultRoomDtoRequest consultRoomDtoRequest) {
+        ConsultRoom consultRoom = consultRoomRepository.findById(id)
+                .orElseThrow(() -> new ConsultRoomNotFoundException("Consult Room with ID: " + id + " Not Found"));
+
+        consultRoomMapper.updateConsultRoomFromDto(consultRoomDtoRequest, consultRoom);
+
+        return consultRoomMapper.toConsultRoomDtoResponse(consultRoomRepository.save(consultRoom));
+
     }
 
     @Override
     public void deleteConsultRoom(Long id) {
-        if (!consultRoomRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Consult Room not found with ID: " + id);
+
+        if(!consultRoomRepository.existsById(id)){
+            throw new ConsultRoomNotFoundException("Consult Room with ID: " + id + " Not Found");
         }
+
         consultRoomRepository.deleteById(id);
     }
 

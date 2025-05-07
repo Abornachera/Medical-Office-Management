@@ -1,5 +1,12 @@
 package edu.unimagdalena.medicalofficemanagement.service.impl;
 
+import edu.unimagdalena.medicalofficemanagement.dto.request.AppointmentDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.request.AppointmentDtoUpdateRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.AppointmentDtoResponse;
+import edu.unimagdalena.medicalofficemanagement.exception.notFound.AppointmentNotFoundException;
+import edu.unimagdalena.medicalofficemanagement.exception.notFound.ConsultRoomNotFoundException;
+import edu.unimagdalena.medicalofficemanagement.exception.notFound.DoctorNotFoundException;
+import edu.unimagdalena.medicalofficemanagement.exception.notFound.PatientNotFoundException;
 import edu.unimagdalena.medicalofficemanagement.repository.AppointmentRepository;
 import edu.unimagdalena.medicalofficemanagement.repository.ConsultRoomRepository;
 import edu.unimagdalena.medicalofficemanagement.repository.DoctorRepository;
@@ -13,134 +20,118 @@ import edu.unimagdalena.medicalofficemanagement.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+
 public class AppointmentServiceImpl implements AppointmentService {
-    private final AppointmentRepository appointmentRepository;
-    private final PatientRepository patientRepository;
-    private final DoctorRepository doctorRepository;
-    private final ConsultRoomRepository consultRoomRepository;
-    private final AppointmentMapper appointmentMapper;
+
+    private AppointmentRepository appointmentRepository;
+    private AppointmentMapper appointmentMapper;
+    private PatientRepository patientRepository;
+    private ConsultRoomRepository consultRoomRepository;
+    private DoctorRepository doctorRepository;
+
 
     @Override
-    public AppointmentDTO createAppointment(AppointmentDTO dto) {
-        Patient patient = patientRepository.findById(dto.getPatientId())
-                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + dto.getPatientId()));
-        Doctor doctor = doctorRepository.findById(dto.getDoctorId())
-                .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + dto.getDoctorId()));
-        ConsultRoom consultRoom = consultRoomRepository.findById(dto.getConsultRoomId()).
-                orElseThrow(()-> new RuntimeException("ConsultRoom not found with ID: " + dto.getConsultRoomId()));
-        List<Appointment> conflicts = appointmentRepository.findConflicts(consultRoom.getId(), doctor.getId(), dto.getStartTime(), dto.getEndTime());
+    public List<AppointmentDtoResponse> findAllAppointments() {
+        return appointmentRepository.findAll().stream()
+                .map(appointmentMapper::toAppointmentDtoResponse)
+                .toList();
+    }
+
+    @Override
+    public AppointmentDtoResponse findAppointmentById(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new AppointmentNotFoundException("Appointment with ID: " + id + " Not Found"));
+
+        return appointmentMapper.toAppointmentDtoResponse(appointment);
+    }
+
+    @Override
+    public AppointmentDtoResponse saveAppointment(AppointmentDtoRequest appointmentDtoRequest) {
+
+        validarRangoHorario(appointmentDtoRequest.startTime(), appointmentDtoRequest.endTime());
+
+        Patient patient = patientRepository.findById(appointmentDtoRequest.idPatient())
+                .orElseThrow(() -> new PatientNotFoundException("Patient with ID: " + appointmentDtoRequest.idPatient() + " not found"));
+
+        Doctor doctor = doctorRepository.findById(appointmentDtoRequest.idDoctor())
+                .orElseThrow(() -> new DoctorNotFoundException("Doctor with ID: " + appointmentDtoRequest.idDoctor() + " not Found"));
+
+        ConsultRoom consultRoom = consultRoomRepository.findById(appointmentDtoRequest.idConsultRoom())
+                .orElseThrow(() -> new ConsultRoomNotFoundException("Consult Room with ID: " + appointmentDtoRequest.idConsultRoom() + " not Found"));
+
+        List<Appointment> conflicts = appointmentRepository.findConflicts(
+                appointmentDtoRequest.idConsultRoom(),
+                appointmentDtoRequest.startTime(),
+                appointmentDtoRequest.endTime()
+        );
 
         if(!conflicts.isEmpty()){
-            throw new ConsultRoomAlreadyAppointmentException("The Consult room is already appointed for the selected time slot.");
-        }
-        long duration = Duration.between(dto.getStartTime(), dto.getEndTime()).toMinutes();
-
-        if(duration < 20 || duration > 180){
-            throw new InvalidAppointmentException("The duration of the appointment should between 20 and 180 minutes");
+            throw new ConsultRoomAlreadyBookedException("Consult room already booked for the selected time slot");
         }
 
-        if (dto.getStartTime().toLocalTime().isBefore(doctor.getAvailableFrom()) ||
-                dto.getEndTime().toLocalTime().isAfter(doctor.getAvailableTo())) {
-            throw new InvalidAppointmentDoctor("The appointment is out of range of the doctor");
+        List<Appointment> conflictsDoctor = appointmentRepository.findConflicsWithDoctor(
+                appointmentDtoRequest.idDoctor(),
+                appointmentDtoRequest.startTime(),
+                appointmentDtoRequest.endTime());
+
+        if(!conflictsDoctor.isEmpty()){
+            throw new DoctorAlreadyBookedException("Doctor has been already booked for the selected time slot");
         }
 
-        if (dto.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new InvalidAppointmentTime("The appointment should be in the future.");
+
+        if(appointmentDtoRequest.startTime().toLocalTime().isBefore(doctor.getAvailableFrom()) || appointmentDtoRequest.endTime().toLocalTime().isAfter(doctor.getAvailableTo())){
+            throw new OutsideWorkingHoursException("The appointment time is outside the doctor's available working hours");
         }
 
-        Appointment appointment = appointmentMapper.toEntity(dto);
+        Appointment appointment = appointmentMapper.toEntity(appointmentDtoRequest);
+        appointment.setDoctor(doctor);
         appointment.setPatient(patient);
         appointment.setConsultRoom(consultRoom);
-        appointment.setDoctor(doctor);
 
-        return appointmentMapper.toDTO(appointmentRepository.save(appointment));
+        return appointmentMapper.toAppointmentDtoResponse(appointmentRepository.save(appointment));
     }
+
     @Override
-    public List<AppointmentDTO> getAllAppointments(){
-        return appointmentRepository.findAll().stream()
-                .map(appointmentMapper::toDTO)
-                .toList();
-    }
-    @Override
-    public AppointmentDTO getAppointmentById(Long id){
-        return appointmentRepository.findById(id)
-                .map(appointmentMapper::toDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + id));
-    }
-    @Override
-    public AppointmentDTO updateAppointment(Long id, AppointmentDTO dto){
-        Appointment existing = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appointment not found with ID: " + id));
+    public AppointmentDtoResponse updateAppointment(Long id, AppointmentDtoUpdateRequest appointmentDtoRequest) {
 
-        if(existing.getStatus() == AppointmentStatus.COMPLETED){
-            throw new StatusAppointmentCompletedException("The appointment existing is completed");
-        }
-
-        Patient patient = patientRepository.findById(dto.getPatientId())
-                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + dto.getPatientId()));
-        Doctor doctor = doctorRepository.findById(dto.getDoctorId())
-                .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + dto.getDoctorId()));
-        ConsultRoom consultRoom = consultRoomRepository.findById(dto.getConsultRoomId()).
-                orElseThrow(()-> new RuntimeException("ConsultRoom not found with ID: " + dto.getConsultRoomId()));
-
-        List<Appointment> conflicts = appointmentRepository.findConflicts(consultRoom.getId(), doctor.getId(), dto.getStartTime(), dto.getEndTime())
-                .stream().filter(b -> !b.getId().equals(id)).toList();
-
-        if (!conflicts.isEmpty()) {
-            throw new ConsultRoomAlreadyAppointmentException("The Consult room is already appointed for the selected time slot.");
-        }
-        long duration = Duration.between(dto.getStartTime(), dto.getEndTime()).toMinutes();
-
-        if(duration < 20 || duration > 180){
-            throw new InvalidAppointmentException("The duration of the appointment it should between 20 and 180 minutes");
-        }
-
-        if (dto.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new InvalidAppointmentTime("The appointment should be in the future.");
-        }
-        existing.setPatient(patient);
-        existing.setConsultRoom(consultRoom);
-        existing.setDoctor(doctor);
-        existing.setStartTime(dto.getStartTime());
-        existing.setEndTime(dto.getEndTime());
-
-        return appointmentMapper.toDTO(appointmentRepository.save(existing));
-    }
-    @Override
-    public AppointmentDTO cancelAppointment(Long id){
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + id));
+                .orElseThrow(() -> new AppointmentNotFoundException("Appointment with ID: " + id + " Not Found"));
+
 
         if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new IllegalStateException("You can´t cancel an appointment completed");
+            throw new AppointmentAlreadyCompletedException("Appointment is already marked as COMPLETED");
         }
 
-        appointment.setStatus(AppointmentStatus.CANCELED);
-        return appointmentMapper.toDTO(appointmentRepository.save(appointment));
-    }
-    @Override
-    public List<AppointmentDTO> getAppointmentsByDoctorAndDate(Long doctorId, LocalDate date){
-        LocalDateTime startOfDay = date.atStartOfDay();
-        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-        return appointmentRepository
-                .findByDoctorIdAndStartTimeBetween(doctorId, startOfDay, endOfDay)
-                .stream()
-                .map(appointmentMapper::toDTO)
-                .toList();
-    }
-    @Override
-    public void deleteAppointment(Long id){
-        if (!appointmentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Booking not found with ID: " + id);
+        if (appointment.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new AppointmentInThePastException("Cannot modify an appointment that has already occurred");
         }
+
+        validarRangoHorario(appointmentDtoRequest.startTime(), appointmentDtoRequest.endTime());
+
+        appointmentMapper.updateAppointmentFromDto(appointmentDtoRequest, appointment);
+
+        return appointmentMapper.toAppointmentDtoResponse(appointmentRepository.save(appointment));
+
+    }
+
+    @Override
+    public void deleteAppointment(Long id) {
+
+        if(!appointmentRepository.existsById(id)){
+            throw new AppointmentNotFoundException("Appointment with ID: " + id + " not Found");
+        }
+
         appointmentRepository.deleteById(id);
+    }
+
+    private void validarRangoHorario(LocalDateTime inicio, LocalDateTime fin) {
+        if (inicio.isAfter(fin) || inicio.equals(fin)) {
+            throw new InvalidTimeRangeException("Start time must be before end time");
+        }
     }
 }
