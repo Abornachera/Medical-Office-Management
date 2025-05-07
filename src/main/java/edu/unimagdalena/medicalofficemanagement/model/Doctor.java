@@ -3,33 +3,36 @@ package edu.unimagdalena.medicalofficemanagement.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 
 @Entity
-@Data
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table (name = "Doctors")
+@Data
 public class Doctor {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idDoctor;
+
+    @OneToMany(mappedBy = "doctor")
+    private List<Appointment> appointment;
+
+    @Column
+    @NotNull
     @NotBlank
-    @Column(nullable = false)
     private String fullName;
 
-    @Email
-    @NotBlank
     @Column(nullable = false)
+    @Email
     private String email;
 
+    @Column(nullable = false)
+    @NotBlank
     private String speciality;
 
     @Column(nullable = false)
@@ -38,6 +41,6 @@ public class Doctor {
     @Column(nullable = false)
     private LocalTime availableTo;
 
-    @OneToMany(mappedBy = "doctor")
-    private Set<Appointment> appointments;
+
+
 }

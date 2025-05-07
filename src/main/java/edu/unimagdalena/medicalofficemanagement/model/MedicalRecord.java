@@ -2,38 +2,41 @@ package edu.unimagdalena.medicalofficemanagement.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
-@Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Builder
-@Table (name = "MedicalRecords")
+@Table(name = "medical_record")
 public class MedicalRecord {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String diagnosis;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idMedicalRecord;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String notes;
-
-    @Column(nullable = false)
-    private LocalDateTime created;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_patient", referencedColumnName = "idPatient")
+    private Patient patient;
 
     @OneToOne
-    @JoinColumn(name = "IdAppointment")
+    @JoinColumn(name = "id_appointment", referencedColumnName = "idAppointment", nullable = false)
     private Appointment appointment;
 
-    @ManyToOne
-    @JoinColumn(name = "IdPatient")
-    private Patient patient;
+    @NotNull
+    @Column(nullable = false)
+    @Size(min = 5, max = 100)
+    private String diagnosis;
+
+    @Column
+    @Size(max = 100)
+    private String notes;
+
+    @Column
+    private LocalDateTime createdAt;
+
 }
