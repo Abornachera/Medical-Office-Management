@@ -4,7 +4,6 @@ import edu.unimagdalena.medicalofficemanagement.repository.AppointmentRepository
 import edu.unimagdalena.medicalofficemanagement.repository.MedicalRecordRepository;
 import edu.unimagdalena.medicalofficemanagement.repository.PatientRepository;
 import edu.unimagdalena.medicalofficemanagement.dto.MedicalRecordDTO;
-import edu.unimagdalena.medicalofficemanagement.exception.ResourceNotFoundException;
 import edu.unimagdalena.medicalofficemanagement.mapper.MedicalRecordMapper;
 import edu.unimagdalena.medicalofficemanagement.model.Appointment;
 import edu.unimagdalena.medicalofficemanagement.model.AppointmentStatus;
