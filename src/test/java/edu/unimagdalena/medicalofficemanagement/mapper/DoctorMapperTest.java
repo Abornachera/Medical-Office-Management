@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class DoctorMapperTest {
 
@@ -43,9 +43,9 @@ class DoctorMapperTest {
     @Test
     void toEntity_shouldMapFieldsExceptId() {
         DoctorDtoRequest dtoRequest = new DoctorDtoRequest(
-                "Dr. Juan Mosquera",
-                "mosqueraJ@unimag.com",
-                "Ginecologo",
+                "Dra. Ana López",
+                "ana.lopez@clinic.com",
+                "Pediatría",
                 LocalTime.of(9, 30),
                 LocalTime.of(18, 0)
         );
