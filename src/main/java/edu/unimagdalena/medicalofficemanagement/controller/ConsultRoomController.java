@@ -1,6 +1,5 @@
 package edu.unimagdalena.medicalofficemanagement.controller;
 
-import edu.unimagdalena.medicalofficemanagement.dto.ConsultRoomDTO;
 import edu.unimagdalena.medicalofficemanagement.service.ConsultRoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

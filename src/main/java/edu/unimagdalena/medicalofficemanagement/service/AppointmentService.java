@@ -1,7 +1,5 @@
 package edu.unimagdalena.medicalofficemanagement.service;
 
-import edu.unimagdalena.medicalofficemanagement.dto.AppointmentDTO;
-
 import java.time.LocalDate;
 import java.util.List;
 

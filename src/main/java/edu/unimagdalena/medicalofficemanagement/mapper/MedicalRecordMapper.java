@@ -1,6 +1,5 @@
 package edu.unimagdalena.medicalofficemanagement.mapper;
 
-import edu.unimagdalena.medicalofficemanagement.dto.MedicalRecordDTO;
 import edu.unimagdalena.medicalofficemanagement.model.MedicalRecord;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,8 +1,6 @@
 package edu.unimagdalena.medicalofficemanagement.service;
 
 
-import edu.unimagdalena.medicalofficemanagement.dto.ConsultRoomDTO;
-
 import java.util.List;
 
 public interface ConsultRoomService {
