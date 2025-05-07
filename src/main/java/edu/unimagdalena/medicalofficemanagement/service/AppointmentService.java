@@ -1,14 +1,16 @@
 package edu.unimagdalena.medicalofficemanagement.service;
 
+import edu.unimagdalena.medicalofficemanagement.dto.request.AppointmentDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.request.AppointmentDtoUpdateRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.AppointmentDtoResponse;
+
 import java.time.LocalDate;
 import java.util.List;
 
 public interface AppointmentService {
-    AppointmentDTO createAppointment(AppointmentDTO dto);
-    List<AppointmentDTO> getAllAppointments();
-    AppointmentDTO getAppointmentById(Long id);
-    AppointmentDTO updateAppointment(Long id, AppointmentDTO dto);
-    AppointmentDTO cancelAppointment(Long id);
-    List<AppointmentDTO> getAppointmentsByDoctorAndDate(Long doctorId, LocalDate date);
+    List<AppointmentDtoResponse> findAllAppointments();
+    AppointmentDtoResponse findAppointmentById(Long id);
+    AppointmentDtoResponse saveAppointment(AppointmentDtoRequest appointmentDtoRequest);
+    AppointmentDtoResponse updateAppointment(Long id, AppointmentDtoUpdateRequest appointmentDtoRequest);
     void deleteAppointment(Long id);
 }

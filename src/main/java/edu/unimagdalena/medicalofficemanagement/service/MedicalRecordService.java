@@ -1,12 +1,14 @@
 package edu.unimagdalena.medicalofficemanagement.service;
 
+import edu.unimagdalena.medicalofficemanagement.dto.request.MedicalRecordDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.MedicalRecordDtoResponse;
+
 import java.util.List;
 
 public interface MedicalRecordService {
-    MedicalRecordDTO createMedicalRecord(MedicalRecordDTO dto);
-    List<MedicalRecordDTO> getAllMedicalRecords();
-    MedicalRecordDTO getMedicalRecordById(Long id);
-    List<MedicalRecordDTO> getMedicalRecordsByPatientId(Long patientId);
-    MedicalRecordDTO updateMedicalRecord(Long id, MedicalRecordDTO dto);
+    List<MedicalRecordDtoResponse> findAllMedicalRecords();
+    MedicalRecordDtoResponse findById(Long id);
+    List<MedicalRecordDtoResponse> findMedicalRecordsByPatient(Long id);
+    MedicalRecordDtoResponse saveMedicalRecord(MedicalRecordDtoRequest medicalRecordDtoRequest);
     void deleteMedicalRecord(Long id);
 }

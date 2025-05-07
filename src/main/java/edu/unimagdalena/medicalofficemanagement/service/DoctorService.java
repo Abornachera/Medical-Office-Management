@@ -1,12 +1,14 @@
 package edu.unimagdalena.medicalofficemanagement.service;
 
+import edu.unimagdalena.medicalofficemanagement.dto.request.DoctorDtoRequest;
+import edu.unimagdalena.medicalofficemanagement.dto.response.DoctorDtoResponse;
+
 import java.util.List;
 
 public interface DoctorService {
-    DoctorDTO createDoctor(DoctorDTO dto);
-    List<DoctorDTO> getAllDoctors();
-    DoctorDTO getDoctorById(Long id);
-    List<DoctorDTO> getDoctorsBySpecialty(String specialty);
-    DoctorDTO updateDoctor(Long id, DoctorDTO dto);
-    void deleteDoctor(Long id);
+    List<DoctorDtoResponse> findAllDoctors();
+    DoctorDtoResponse findDoctorById(Long idDoctor);
+    DoctorDtoResponse saveDoctor(DoctorDtoRequest doctorDtoRequest);
+    DoctorDtoResponse updateDoctor(Long idDoctor, DoctorDtoRequest doctorDtoRequest);
+    void deleteDoctor(Long idDoctor);
 }
