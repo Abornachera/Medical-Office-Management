@@ -2,34 +2,36 @@ package edu.unimagdalena.medicalofficemanagement.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
-@Table (name = "ConsultRooms")
+@Table(name = "consult_room")
 public class ConsultRoom {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @NotBlank
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idConsultRoom;
+
+    @OneToMany(mappedBy = "consultRoom")
+    private List<Appointment> appointments;
+
     @Column(nullable = false)
+    @NotBlank
     private String name;
 
     @Column(nullable = false)
-    private int floor;
+    @Positive
+    private String floor;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column
+    @Size(max = 1000)
     private String description;
-
-    @OneToMany (mappedBy = "consultRoom")
-    private Set<Appointment> appointments;
 }

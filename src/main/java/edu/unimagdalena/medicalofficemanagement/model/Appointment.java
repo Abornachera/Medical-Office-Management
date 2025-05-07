@@ -7,41 +7,41 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
-@Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Builder
-@Table (name = "Appointments")
-public class Appointment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Future
+public class Appointment {
+
+    @Id @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    private Long idAppointment;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_patient", referencedColumnName = "idPatient")
+    private Patient patient;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_doctor", referencedColumnName = "idDoctor")
+    private Doctor doctor;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_consultRoom", referencedColumnName = "idConsultRoom")
+    private ConsultRoom consultRoom;
+
+    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MedicalRecord medicalRecord;
+
     @Column(nullable = false)
+    @Future
     private LocalDateTime startTime;
 
-    @Future
     @Column(nullable = false)
+    @Future
     private LocalDateTime endTime;
 
-    @Column(nullable = false)
+    @Column
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
-    @ManyToOne
-    @JoinColumn (name = "IdPatient")
-    private Patient patient;
-
-    @ManyToOne
-    @JoinColumn (name = "IdConsultRoom")
-    private ConsultRoom consultRoom;
-
-    @ManyToOne
-    @JoinColumn (name = "IdDoctor")
-    private Doctor doctor;
-
-    @OneToOne(mappedBy = "appointment")
-    private MedicalRecord medicalRecord;
 }
