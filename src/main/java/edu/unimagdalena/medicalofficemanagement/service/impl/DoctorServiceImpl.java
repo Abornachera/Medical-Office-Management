@@ -1,7 +1,6 @@
 package edu.unimagdalena.medicalofficemanagement.service.impl;
 
 import edu.unimagdalena.medicalofficemanagement.repository.DoctorRepository;
-import edu.unimagdalena.medicalofficemanagement.exception.ResourceNotFoundException;
 import edu.unimagdalena.medicalofficemanagement.mapper.DoctorMapper;
 import edu.unimagdalena.medicalofficemanagement.model.Doctor;
 import edu.unimagdalena.medicalofficemanagement.service.DoctorService;
